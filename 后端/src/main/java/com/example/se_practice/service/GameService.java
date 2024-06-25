@@ -172,7 +172,7 @@ public class GameService {
         //获取当前所在房间ID
         int in_room_id=this.getNowInRoomId(game_saved_id);
         //在准备阶段将房间状态置为1,表示战斗事件开始
-        tempDao.updateRoomFlagTo1(game_saved_id,in_room_id);
+        tempDao.updateRoomFlagTo1(saved_graph_id,in_room_id);
         //获取当前房间状态，1代表未访问，0代表已访问
         int room_flag=this.getRoom_flag(saved_graph_id,in_room_id);
         if(room_flag==1){
@@ -187,7 +187,7 @@ public class GameService {
         //理论上本情况不应该发生，room_flag不为1时才会触发本情况，而战斗准备时已经将房间flg设为了1
         // 理论上必定发生上面的那种情况，本句只是以防万一
         else {
-            tempDao.updateRoomFlag(game_saved_id,in_room_id);
+            tempDao.updateRoomFlag(saved_graph_id,in_room_id);
             throw new CustomException("敌人已经被勇敢的你打跑了~~~");
         }
     }
@@ -288,7 +288,7 @@ public class GameService {
                     //更新缓存表中敌人的血量
                     tempDao.updateTempEnemyHitPoint(enemy_hit_point);
                     //将房间状态置为0，表示战斗事件结束
-                    tempDao.updateRoomFlag(game_saved_id,in_room_id);
+                    tempDao.updateRoomFlag(saved_graph_id,in_room_id);
                     castSkillResult.setSecond_effect("无畏的勇士，你成功战胜了敌人！");
                     temp_enemy tempEnemy=this.getTempEnemy();
                     castSkillResult.setTempEnemy(tempEnemy);
@@ -327,7 +327,7 @@ public class GameService {
                         playerDao.updateRoleMagicPoint(player_status_id,player_magic_point);
                         tempDao.updateTempEnemyHitPoint(enemy_hit_point);
                         //将房间状态置为0，表示战斗事件结束
-                        tempDao.updateRoomFlag(game_saved_id,in_room_id);
+                        tempDao.updateRoomFlag(saved_graph_id,in_room_id);
                         castSkillResult.setSecond_effect("无畏的勇士，你成功战胜了敌人！");
                         temp_enemy tempEnemy=this.getTempEnemy();
                         castSkillResult.setTempEnemy(tempEnemy);
