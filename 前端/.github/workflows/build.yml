@@ -1,0 +1,40 @@
+name: Build and Deploy Frontend
+
+on:
+  push:
+    branches:
+      - master  # 触发主分支推送时执行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 提取仓库代码
+        uses: actions/checkout@v2
+
+      - name: 安装node.js文件
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.12.1'  # 可根据项目需要选择Node.js版本
+
+      - name: 安装项目依赖包
+        run: npm install  # 如果是使用yarn，改为yarn install
+
+      - name: 执行前端项目
+        run: npm run build  # 根据项目配置的命令进行构建，比如npm run build
+
+      - name: 打包存档文件
+        uses: actions/upload-artifact@v2
+        with:
+          name: frontend-dist
+          path: dist  # 构建生成的静态文件目录，根据项目配置修改
+
+      - name: 部署前端应用到GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # GitHub Token，需要在仓库设置中添加
+          BRANCH: gh-pages  # 发布到的分支，通常是gh-pages
+          FOLDER: dist  # 构建生成的静态文件目录
+
+

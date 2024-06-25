@@ -1,0 +1,6 @@
+@font-face {
+    font-family:'xs';
+    src: url('~@/assets/text/unifont.otf');/*字体文件路径*/
+    font-weight: normal;
+    font-style: normal;
+}
