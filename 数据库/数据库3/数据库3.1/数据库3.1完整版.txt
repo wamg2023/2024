@@ -1,0 +1,511 @@
+/**************表（表项1，表项2...）***********
+// 仅仅只有描述属性（如name/description）的表（如skill）不单独设立其attribute表，
+       而具有数值属性（如type/weight）的表（如item/role_initial_attribute）单独设立其attribute表
+/* 游戏注册 */
+user(account, password, player_id)
+
+/* 游戏静态资源 */
+role(role_id, role_initial_attribute_id, role_initial_skill_table_id)	//role目前由{player,enemy}组成
+
+role_initial_attribute(role_initial_attribute_id, description, type, hit_point, magic_point, attack, defence, speed, max_weight)
+role_initial_skill_table(li_id, role_initial_skill_table_id, skill_id)
+
+skill(skill_id, name, description, self_effect_id, enemy_effect_id)
+self_effect(current_self_effect_id, hit_point, magic_point, attack, defence, speed)
+enemy_effect(enemy_effect_id, power, attack, defence, speed)
+
+initial_graph(li_id, initial_graph_id, room_id, room_flag, initial_inventory_id, east_room_id, west_room_id, south_room_id, north_room_id)
+initial_inventory(li_id, initial_inventory_id, item_id, item_num)
+room(room_id, name, description, room_event_id)
+room_event(room_event_id, type, description, probability, enemy_id, teleportation_room_id, got_item_id)
+
+item(item_id, item_attribute_id, item_effect_id)
+item_attribute(item_attribute_id, name, description, type, weight)
+item_effect(item_effect_id, hit_point, magic_point, attack, defence, speed)
+
+//触发器--删除
+role--role_initial_attribute/role_initial_skill_table
+skill--self_effect/enemy_effect
+initial_graph--inventory_id
+item--item_attribute/item_effect
+
+// 游戏动态存档
+player__saved(player_id, game_saved_id)
+
+game_saved(game_saved_id, player_attribute_id, player_status_id, inventory_id, player_skill_table_id, saved_graph, in_room_id)
+
+player_attribute(player_attribute_id, type, description, hit_point, magic_point, attack, defence, speed, max_weight)
+player_status(player_status_id, hit_point, magic_point)
+inventory(li_id, inventory_id, item_id, item_num)
+player_skill_table(li_id, player_skill_table_id, skill_id)
+saved_graph(li_id, saved_graph_id, room_id, room_flag, inventory_id, east_room_id, west_room_id, south_room_id, north_room_id, last_room_id)
+
+//游戏缓存
+temp_player__saved (player_id,selection,game_saved_id)
+temp_enemy (enemy_id,hit_point)
+
+//触发器--删除
+user--player__saved
+player__saved--game_saved
+game_saved--player_attribute/player_status/inventory/player_skill_table/saved_graph
+saved_graph--inventory_id
+***********************************************/
+
+
+drop database if exists es_practice3;
+drop database if exists se_practice3;
+
+create database se_practice3 character set gbk collate gbk_chinese_ci;
+
+use se_practice3;
+/**************************************************表*****************************************************/
+/********************************用户信息（1）********************************/
+/*账号密码*/  
+DROP TABLE IF EXISTS user;  
+
+CREATE TABLE user(  
+    account 	VARCHAR(15) NOT NULL,  
+
+    password 	VARCHAR(15) NOT NULL,  
+
+    player_id 	INT(10) NOT NULL,  
+
+    PRIMARY KEY(account)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+/********************************用户信息********************************/
+
+
+/********************************静态资源（13）********************************/
+/*人物*/ 
+DROP TABLE IF EXISTS role;  
+
+CREATE TABLE role(  
+    role_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,  
+
+    role_initial_attribute_id 	INT(10) NOT NULL,  
+    role_initial_skill_table_id 	INT(10) NOT NULL,  
+
+    PRIMARY KEY (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*角色初始属性*/
+DROP TABLE IF EXISTS role_initial_attribute;
+CREATE TABLE role_initial_attribute (
+  role_initial_attribute_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  description VARCHAR(100) NOT NULL DEFAULT '角色描述',
+
+  type VARCHAR(15) NOT NULL,
+  hit_point 		INT(10) NOT NULL DEFAULT 100,
+  magic_point 		INT(10) NOT NULL DEFAULT 100,
+  attack 			INT(10) NOT NULL DEFAULT 10,
+  defence 			INT(10) NOT NULL DEFAULT 10,
+  speed 			INT(10) NOT NULL DEFAULT 10,
+  max_weight 		INT(10) NOT NULL DEFAULT 100 COMMENT '最大承重',
+
+  PRIMARY KEY (role_initial_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*初始技能表*/
+DROP TABLE IF EXISTS role_initial_skill_table;
+CREATE TABLE role_initial_skill_table (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_initial_skill_table_id 	INT(10) UNSIGNED NOT NULL,
+
+  skill_id 			INT(10) NOT NULL,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*技能*/
+DROP TABLE IF EXISTS skill;
+CREATE TABLE skill (
+  skill_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) NOT NULL DEFAULT '技能名字',
+  description 		VARCHAR(100) NOT NULL DEFAULT '技能描述',
+
+  self_effect_id 		INT(10) NOT NULL COMMENT '对己效果id',
+  enemy_effect_id 		INT(10) NOT NULL COMMENT '对敌效果id',
+
+  PRIMARY KEY (skill_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*技能对己效果*/
+DROP TABLE IF EXISTS self_effect;
+CREATE TABLE self_effect (
+  self_effect_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point	 		INT(10) NOT NULL DEFAULT 0 COMMENT '血量效果',
+  magic_point 		INT(10) NOT NULL DEFAULT 0 COMMENT '蓝量效果',
+  attack 			INT(10) NOT NULL DEFAULT 0 COMMENT '攻击效果',
+  defence 			INT(10) NOT NULL DEFAULT 0 COMMENT '防御效果',
+  speed 			INT(10) NOT NULL DEFAULT 0 COMMENT '速度效果',
+
+  PRIMARY KEY (self_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*技能对敌效果*/
+DROP TABLE IF EXISTS enemy_effect;
+CREATE TABLE enemy_effect (
+  enemy_effect_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  power 			int(10) NOT NULL COMMENT '技能威力',
+  attack 			int(10) NOT NULL DEFAULT 0 COMMENT '对敌攻击属性',
+  defence 			int(10) NOT NULL DEFAULT 0 COMMENT '对敌防御属性',
+  speed 			int(10) NOT NULL DEFAULT 0 COMMENT '对敌速度属性',
+
+  PRIMARY KEY (enemy_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+/*初始地图*/
+DROP TABLE IF EXISTS initial_graph;
+CREATE TABLE initial_graph (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  initial_graph_id 		INT(10) UNSIGNED NOT NULL,
+
+  room_id 		INT(10) NOT NULL,
+  room_flag 		TINYINT(1) NOT NULL DEFAULT 1 COMMENT '房间标识。未探索为1，探索了为0',
+  initial_inventory_id INT(10) NOT NULL DEFAULT -1,
+  east_room_id 		INT(10) NOT NULL DEFAULT -1,
+  west_room_id 		INT(10) NOT NULL DEFAULT -1,
+  south_room_id 		INT(10) NOT NULL DEFAULT -1,
+  north_room_id 		INT(10) NOT NULL DEFAULT -1,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*静态物品栏*/
+DROP TABLE IF EXISTS initial_inventory;
+CREATE TABLE initial_inventory (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  initial_inventory_id 	INT(10) NOT NULL DEFAULT -1,
+
+  item_id 			INT(10) NOT NULL DEFAULT -1,
+  item_num 		TINYINT(2) NOT NULL DEFAULT -1,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*房间*/
+DROP TABLE IF EXISTS room;
+CREATE TABLE room (
+  room_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) NOT NULL DEFAULT '房间名字',
+  description 		VARCHAR(100) NOT NULL DEFAULT '房间描述',
+
+  room_event_id 		INT(10) NOT NULL,
+
+  PRIMARY KEY (room_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*房间事件 */
+DROP TABLE IF EXISTS room_event;
+CREATE TABLE room_event (
+  room_event_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  type 			VARCHAR(15) NOT NULL DEFAULT '野怪出没',
+  description 		VARCHAR(100) NOT NULL DEFAULT '房间事件描述',
+  probability 		FLOAT NOT NULL,
+
+  enemy_id 		INT(10) NOT NULL DEFAULT -1 COMMENT '怪物id',
+  teleportation_room_id 	INT(10) NOT NULL DEFAULT -1 COMMENT '传送房间id',
+  got_item_id 		INT(10) NOT NULL DEFAULT -1 COMMENT '拾取物件id',
+
+  PRIMARY KEY (room_event_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品*/
+DROP TABLE IF EXISTS item;
+
+CREATE TABLE item (
+  item_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  item_attribute_id 		INT(10) NOT NULL,
+  item_effect_id 		INT(10) NOT NULL,
+
+  PRIMARY KEY (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品属性*/
+DROP TABLE IF EXISTS item_attribute;
+CREATE TABLE item_attribute (
+  item_attribute_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) NOT NULL DEFAULT '物品名字',
+  description 		VARCHAR(100) NOT NULL DEFAULT '物品描述',
+
+  type 			VARCHAR(15) NOT NULL DEFAULT '食物',
+  weight 			INT(10) NOT NULL,
+
+  PRIMARY KEY (item_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品效果*/
+DROP TABLE IF EXISTS item_effect_id;
+CREATE TABLE item_effect_id (
+  item_effect_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point 		INT(10) NOT NULL DEFAULT 0 COMMENT '血量效果',
+  magic_point 		INT(10) NOT NULL DEFAULT 0 COMMENT '蓝量效果',
+  attack 			INT(10) NOT NULL DEFAULT 0 COMMENT '攻击效果',
+  defence 			INT(10) NOT NULL DEFAULT 0 COMMENT '防御效果',
+  speed 			INT(10) NOT NULL DEFAULT 0 COMMENT '速度效果',
+
+  PRIMARY KEY (item_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/********************************静态资源********************************/
+
+
+/**********************************存档（7）**********************************/
+/*玩家-存档*/
+DROP TABLE IF EXISTS player_saved;
+DROP TABLE IF EXISTS player__saved;
+CREATE TABLE player__saved (  
+  player_id 	INT(10) NOT NULL,  
+  selection	 TINYINT(1) UNSIGNED NOT NULL COMMENT '选择的存档，2024.06.19--三个存档：1/2/3',
+  game_saved_id 	INT(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+/*存档*/
+DROP TABLE IF EXISTS game_saved;
+CREATE TABLE game_saved (
+  game_saved_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  player_attribute_id 	INT(10) NOT NULL DEFAULT -1,
+  player_status_id 		INT(10) NOT NULL DEFAULT -1,
+  inventory_id 		INT(10) NOT NULL DEFAULT -1,
+  player_skill_table_id 	INT(10) NOT NULL DEFAULT 1,
+  saved_graph_id 		INT(10) NOT NULL DEFAULT -1,
+  in_room_id 		INT(10) NOT NULL DEFAULT 1,
+
+  PRIMARY KEY (game_saved_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*玩家属性*/
+DROP TABLE IF EXISTS player_attribute;
+CREATE TABLE player_attribute (
+  player_attribute_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  description VARCHAR(100) NOT NULL DEFAULT '自诩是罗林的后世弟子，但是拙劣的剑术总是告诉了一切',
+
+  type VARCHAR(15) NOT NULL DEFAULT '见习剑客',
+  hit_point 		INT(10) NOT NULL DEFAULT 100,
+  magic_point 		INT(10) NOT NULL DEFAULT 100,
+  attack 			INT(10) NOT NULL DEFAULT 10,
+  defence 			INT(10) NOT NULL DEFAULT 10,
+  speed 			INT(10) NOT NULL DEFAULT 10,
+  max_weight 		INT(10) NOT NULL DEFAULT 100 COMMENT '最大承重',
+
+  PRIMARY KEY (player_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*玩家状态 */
+DROP TABLE IF EXISTS player_status;
+CREATE TABLE player_status (
+  player_status_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point 		INT(10) NOT NULL DEFAULT 100,
+  magic_point 		INT(10) NOT NULL DEFAULT 100,
+
+  PRIMARY KEY (player_status_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品栏*/
+DROP TABLE IF EXISTS inventory;
+CREATE TABLE inventory (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  inventory_id 		INT(10) NOT NULL DEFAULT -1,
+
+  item_id 			INT(10) NOT NULL DEFAULT -1,
+  item_num 		TINYINT(2) NOT NULL DEFAULT -1,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*存档技能表*/
+DROP TABLE IF EXISTS player_skill_table;
+CREATE TABLE player_skill_table (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  player_skill_table_id 	INT(10) NOT NULL DEFAULT -1,
+
+  skill_id 			INT(10) NOT NULL DEFAULT -1,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*存档地图*/
+DROP TABLE IF EXISTS saved_graph;
+CREATE TABLE saved_graph (
+  li_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  saved_graph_id 		INT(10) NOT NULL DEFAULT -1,
+
+  room_id 		INT(10) NOT NULL DEFAULT -1,
+  room_flag 		TINYINT(1) NOT NULL DEFAULT 1 COMMENT '房间标识。未探索为1，探索了为0',
+  inventory_id INT(10) NOT NULL DEFAULT -1,
+  east_room_id 		INT(10) NOT NULL DEFAULT -1,
+  west_room_id 		INT(10) NOT NULL DEFAULT -1,
+  south_room_id 		INT(10) NOT NULL DEFAULT -1,
+  north_room_id 		INT(10) NOT NULL DEFAULT -1,
+  last_room_id INT(10) NOT NULL DEFAULT -1,
+
+  PRIMARY KEY (li_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/**********************************存档**********************************/
+
+
+/*************************游戏缓存********************/
+CREATE TABLE temp_player__saved (
+  player_id int(10) DEFAULT -1,
+  selection int(10) DEFAULT -1,
+  game_saved_id int(10) DEFAULT -1
+) ENGINE=InnoDB DEFAULT CHARSET=gbk
+
+CREATE TABLE temp_enemy (
+  enemy_id int(10) DEFAULT -1,
+  hit_point int(10) DEFAULT -1
+) ENGINE=InnoDB DEFAULT CHARSET=gbk
+/*************************游戏缓存********************/
+/**************************************************表*****************************************************/
+
+
+
+/*************************************************触发器***********************************************/
+/*********************静态资源*********************/
+/*
+role(role_initial_attribute_id)--role_initial_attribute(role_initial_attribute_id)
+role(role_initial_skill_table_id)--role_initial_skill_table(role_initial_skill_table_id)
+*/
+DROP TRIGGER IF EXISTS after_role_delete; 
+DELIMITER //  
+CREATE TRIGGER after_role_delete  
+AFTER DELETE ON role  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_initial_attribute WHERE role_initial_attribute_id = OLD.role_initial_attribute_id;  
+    DELETE FROM role_initial_skill_table WHERE role_initial_skill_table_id = OLD.role_initial_skill_table_id;    
+END;  
+//  
+DELIMITER ;
+
+
+/*
+skill(self_effect_id)--self_effect(self_effect_id)
+skill(enemy_effect_id)--enemy_effect(enemy_effect_id)
+*/
+DROP TRIGGER IF EXISTS after_skill_delete; 
+DELIMITER //  
+CREATE TRIGGER after_skill_delete  
+AFTER DELETE ON skill  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM self_effect WHERE self_effect_id = OLD.self_effect_id; 
+    DELETE FROM enemy_effect WHERE enemy_effect_id = OLD.enemy_effect_id; 
+END;  
+//  
+DELIMITER ;
+
+
+/*
+initial_graph(inventory_id)--inventory(inventory_id)
+*/
+DROP TRIGGER IF EXISTS after_initial_graph_delete ; 
+DELIMITER //  
+CREATE TRIGGER after_initial_graph_delete  
+AFTER DELETE ON initial_graph  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM initial_inventory WHERE initial_inventory_id = OLD.initial_inventory_id; 
+END;  
+//  
+DELIMITER ;
+
+
+/*
+item(item_attribute_id)--item_attribute(item_attribute_id)
+item(item_effect_id)--item_effect(item_effect_id)
+*/
+DROP TRIGGER IF EXISTS after_item_delete; 
+DELIMITER //  
+CREATE TRIGGER after_item_delete  
+AFTER DELETE ON item  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM item_attribute WHERE item_attribute_id = OLD.item_attribute_id;  
+    DELETE FROM item_effect WHERE item_effect_id = OLD.item_effect_id;  
+END;  
+//  
+DELIMITER ;
+/*********************静态资源*********************/
+
+
+/*********************存档*********************/
+/*
+user(player_id)--player__saved(player_id)
+*/
+DROP TRIGGER IF EXISTS after_user_delete ; 
+DELIMITER //  
+CREATE TRIGGER after_user_delete  
+AFTER DELETE ON user  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM player__saved WHERE player_id = OLD.player_id;  
+END;  
+//  
+DELIMITER ;
+
+
+/*
+player__saved(game_saved_id)--game_saved(game_saved_id)
+*/
+DROP TRIGGER IF EXISTS after_player__saved_delete ; 
+DELIMITER //  
+CREATE TRIGGER after_player__saved_delete  
+AFTER DELETE ON player__saved  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM game_saved WHERE game_saved_id = OLD.game_saved_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+game_saved(player_attribute_id)--player_attribute(player_attribute_id)
+game_saved(player_status_id)--player_status(player_status_id)
+game_saved(inventory_id)--inventory(inventory_id)
+game_saved(player_skill_table_id)--player_skill_table(player_skill_table_id)
+game_saved(saved_graph_id)--saved_graph(saved_graph_id)
+*/
+DROP TRIGGER IF EXISTS after_game_saved_delete ;
+DELIMITER //  
+CREATE TRIGGER after_game_saved_delete  
+AFTER DELETE ON game_saved  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM player_attribute WHERE player_attribute_id = OLD.player_attribute_id;  
+    DELETE FROM player_status WHERE player_status_id = OLD.player_status_id;  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id;  
+    DELETE FROM player_skill_table WHERE player_skill_table_id = OLD.player_skill_table_id;  
+    DELETE FROM saved_graph WHERE saved_graph_id = OLD.saved_graph_id;  
+END;  
+//  
+DELIMITER ;
+
+
+/*
+saved_graph(inventory_id)--inventory(inventory_id)
+*/
+DROP TRIGGER IF EXISTS after_saved_graph_delete ;
+DELIMITER //  
+CREATE TRIGGER after_saved_graph_delete  
+AFTER DELETE ON saved_graph  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id; 
+END;  
+//  
+DELIMITER ;
+/*********************存档*********************/
+/*************************************************触发器***********************************************/

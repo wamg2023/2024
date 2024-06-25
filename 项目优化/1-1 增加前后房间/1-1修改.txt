@@ -1,0 +1,9 @@
+数据库3.2
+initial_graph、saved_graph增加upper_room_id和lower_room_id
+
+后端
+修改initial_graph、saved_graph对应的pojo类
+返回房间信息/getRoom返回信息增加upper_room_id、lower_room_id
+
+前端
+展示房间信息增加前后房间

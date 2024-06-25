@@ -1,0 +1,104 @@
+/*
+本次更新新增了存档功能，对于旧的存档方式进行了更新，现在可以保存地图信息了
+在房间获取物品被归类于房间事件-拾取物品之中
+*/
+
+/*
+表修改：
+* 表项修改
+user表的role_id表项名修改为player_id
+
+* 表项删除
+role_attribute表删除role_status_id表项
+room表删除表项status、inventory_id
+
+* 表项增加
+role表增加role_saved_id
+
+* 新增表
+role_saved(role_saved_id, role_status_id, graph_id)
+graph(graph_seq_id, graph_id, room_status, room_id,  east_room_id, west_room_id, south_room_id, north_room_id)
+*/
+
+/*
+触发器
+* 删除、修改触发器
+1. 删除触发器after_role_attribute_delete	‘删除role_attribute(role_status_id)，	相同role_status(role_status_id)同步’
+2. 删除触发器after_room_delete	‘删除room(inventory_id)，		相同inventory(inventory_id)同步‘
+
+
+
+* 新增触发器
+** 数据的删除同步
+1. 删除role(role_saved_id)，		相同role_saved(role_saved_id)同步
+
+2. 删除role_saved(role_status_id)，	相同role_status(role_status_id)同步
+3. 删除role_saved(graph_id)，		相同graph(graph_id)同步
+*/
+
+
+// 表的修改直接可视化进行
+//表的创建
+/*玩家存档*/
+DROP TABLE IF EXISTS role_saved;
+CREATE TABLE role_saved (
+  role_saved_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  role_status_id 		INT(10) UNSIGNED NOT NULL,
+  graph_id 		INT(10) UNSIGNED NOT NULL,
+
+  PRIMARY KEY (role_saved_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*存档地图*/
+DROP TABLE IF EXISTS graph;
+CREATE TABLE graph (
+  graph_seq_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  graph_id 		INT(10) UNSIGNED NOT NULL,
+
+  room_status 		TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '房间状态。未探索为1，探索了为0',
+
+  room_id 		INT(10) UNSIGNED NOT NULL,
+  east_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  west_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  south_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  north_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (graph_seq_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*触发器*/
+DROP TRIGGER IF EXISTS after_role_attribute_delete; 
+DROP TRIGGER IF EXISTS after_room_delete; 
+
+DROP TRIGGER IF EXISTS after_role_delete; 
+DELIMITER //  
+CREATE TRIGGER after_role_delete  
+AFTER DELETE ON role  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_attribute WHERE role_attribute_id = OLD.role_attribute_id;  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id;    
+    DELETE FROM skill_table WHERE skill_table_id = OLD.skill_table_id;  
+    DELETE FROM role_saved WHERE role_saved_id = OLD.role_saved_id;  
+END;  
+//  
+DELIMITER ;
+
+
+/*
+删除role_saved(role_status_id)，	相同role_status(role_status_id)同步
+删除role_saved(graph_id)，		相同graph(graph_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_role_saved_delete  
+AFTER DELETE ON role_saved  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_status WHERE role_status_id = OLD.role_status_id;  
+    DELETE FROM graph WHERE graph_id = OLD.graph_id;  
+END;  
+//  
+DELIMITER ;
+
+mysql -uroot -p123456 SE_practice1>C:/Users/86187/Desktop/软件工程实践/数据库/表与外键/SE数据库创建.sql

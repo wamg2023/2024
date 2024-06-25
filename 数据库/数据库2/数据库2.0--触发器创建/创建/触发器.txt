@@ -1,0 +1,105 @@
+/*
+1. 删除user(role_id)，			相同role(role_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_user_delete  
+AFTER DELETE ON user  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role WHERE role_id = OLD.role_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+2. 删除role(role_attribute_id)，		相同role_attribute(role_attribute_id)同步
+3. 删除role(inventory_id)，			相同inventory(inventory_id)同步
+4. 删除role(skill_table_id)，			相同skill_table(skill_table_id)同步
+*/
+
+DELIMITER //  
+CREATE TRIGGER after_role_delete  
+AFTER DELETE ON role  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_attribute WHERE role_attribute_id = OLD.role_attribute_id;  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id;    
+    DELETE FROM skill_table WHERE skill_table_id = OLD.skill_table_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+5. 删除role_attribute(role_status_id)，		相同role_status(role_status_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_role_attribute_delete  
+AFTER DELETE ON role_attribute  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_status WHERE role_status_id = OLD.role_status_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+6. 删除skill(current_self_effect_id)，		相同current_self_effect(current_self_effect_id)同步
+7. 删除skill(enemy_effect_id)，			相同enemy_effect(enemy_effect_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_skill_delete  
+AFTER DELETE ON skill  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM current_self_effect WHERE current_self_effect_id = OLD.current_self_effect_id; 
+    DELETE FROM enemy_effect WHERE enemy_effect_id = OLD.enemy_effect_id; 
+END;  
+//  
+DELIMITER ;
+
+
+/*
+8. 删除item(global_self_effect_id)，		相同global_self_effect(global_self_effect_id)同步
+9. 删除item(item_attribute_id)，		相同item_attribute(item_attribute_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_item_delete  
+AFTER DELETE ON item  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM global_self_effect WHERE global_self_effect_id = OLD.global_self_effect_id;  
+    DELETE FROM item_attribute WHERE item_attribute_id = OLD.item_attribute_id;  
+END;  
+//  
+DELIMITER ;
+
+
+/*
+10. 删除room(inventory_id)，			相同inventory(inventory_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_room_delete  
+AFTER DELETE ON room  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id;  
+END;  
+//  
+DELIMITER ;
+
+
+
+//删除触发器
+DROP TRIGGER IF EXISTS after_item_delete; 
+
+
+//作删除格式保留
+DELIMITER //  
+CREATE TRIGGER after_user_delete  
+AFTER DELETE ON user  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role WHERE role_id = OLD.role_id;  
+END;  
+//  
+DELIMITER ;

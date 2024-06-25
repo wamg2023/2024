@@ -1,0 +1,27 @@
+击败野怪获得的经验与金币计算公式相同
+击败野怪获得G:  0.1*enemy.HP+0.5*enemy.ATK+0.5*enemy.DEF+0.1*enemy.SPD
+设置商店房间
+
+数据库3.5
+player_attribute新增Gold
+item_attribute新增Cost
+新建room__commodity表（room_id, commodity_id, commodity_num）
+item_effect新增max_weight表项
+
+后端
+pojo类：
+player_attribute新增Gold
+item_attribute新增Cost
+新增room__commodity类（room_id, commodity_id）
+
+从room__commodity表（room_id, commodity_id）中获取当前房间商品信息
+获取金币与击杀野怪获取经验相同
+购买物品：
+if player_attribute.G >= item_attribute.Cost
+	player_attribute.G -= item_attribute.Cost
+	拾取物品（同在房间事件中拾取物品）
+else
+	买不起穷逼，别他妈瞎几把点了
+
+前端
+设计商店房间和购买界面

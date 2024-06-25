@@ -1,0 +1,331 @@
+/*
+本次更新新增了存档功能，对于旧的存档方式进行了更新，现在可以保存地图信息了
+在房间获取物品被归类于房间事件-拾取物品之中
+*/
+
+/*
+表修改：
+* 表项修改
+user表的role_id表项名修改为player_id
+
+* 表项删除
+role_attribute表删除role_status_id表项
+room表删除表项status、inventory_id
+
+* 表项增加
+role表增加role_saved_id
+
+* 新增表
+role_saved(role_saved_id, role_status_id, graph_id)
+graph(graph_seq_id, graph_id, room_status, room_id,  east_room_id, west_room_id, south_room_id, north_room_id)
+*/
+
+/*
+drop database if exists es_practice2;
+drop database if exists se_practice2;
+
+create database se_practice2 character set gbk collate gbk_chinese_ci;
+
+use se_practice2;
+/*账号密码*/  
+DROP TABLE IF EXISTS user;  
+
+CREATE TABLE user(  
+    account 	VARCHAR(15) NOT NULL,  
+
+    password 	VARCHAR(15) NOT NULL,  
+
+    palyer_id 	INT(10) UNSIGNED NOT NULL,  
+
+    PRIMARY KEY(account)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+
+
+/*人物*/ 
+DROP TABLE IF EXISTS role;  
+
+CREATE TABLE role(  
+    role_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,  
+
+    type 			TINYINT(2) UNSIGNED DEFAULT 1 COMMENT '人物类型。玩家为1，怪物为0',
+
+    inventory_id 		INT(10) UNSIGNED NOT NULL,
+    role_attribute_id 		INT(10) UNSIGNED NOT NULL,  
+    skill_table_id 		INT(10) UNSIGNED NOT NULL,  
+    role_saved_id		INT(10) UNSIGNED NOT NULL,
+
+    PRIMARY KEY (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品栏*/
+CREATE TABLE inventory (
+  inventory_seq_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  inventory_id 		INT(10) UNSIGNED NOT NULL,
+
+  item_id 			INT(10) UNSIGNED DEFAULT NULL,
+  item_num 		TINYINT(2) UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (inventory_seq_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品*/
+DROP TABLE IF EXISTS item;
+
+CREATE TABLE item (
+  item_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) DEFAULT '物品名字',
+
+  item_attribute_id 		INT(10) UNSIGNED NOT NULL,
+  global_self_effect_id 	INT(10) UNSIGNED NOT NULL,
+
+  PRIMARY KEY (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*物品属性*/
+DROP TABLE IF EXISTS item_attribute;
+CREATE TABLE item_attribute (
+  item_attribute_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  type 			VARCHAR(15) DEFAULT '普通物品',
+  weight 			INT(10) UNSIGNED DEFAULT 0,
+  description 		VARCHAR(100) DEFAULT '物品描述',
+
+  PRIMARY KEY (item_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*效果*/
+/*全局玩家效果*/
+DROP TABLE IF EXISTS global_self_effect;
+CREATE TABLE global_self_effect (
+  global_self_effect_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point 		INT(10) DEFAULT NULL COMMENT '全局血量效果',
+  magic_point 		INT(10) DEFAULT NULL COMMENT '全局蓝量效果',
+  attack 			INT(10) DEFAULT NULL COMMENT '全局攻击效果',
+  defence 			INT(10) DEFAULT NULL COMMENT '全局防御效果',
+  speed 			INT(10) DEFAULT NULL COMMENT '全局速度效果',
+
+  PRIMARY KEY (global_self_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*玩家属性*/
+DROP TABLE IF EXISTS role_attribute;
+CREATE TABLE role_attribute (
+  role_attribute_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point 		INT(10) UNSIGNED DEFAULT 100,
+  magic_point 		INT(10) UNSIGNED DEFAULT 100,
+  attack 			INT(10) UNSIGNED DEFAULT 10,
+  defence 			INT(10) UNSIGNED DEFAULT 10,
+  speed 			INT(10) UNSIGNED DEFAULT 10,
+  role_load 		INT(10) UNSIGNED DEFAULT 100 COMMENT '最大承重',
+
+  PRIMARY KEY (role_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*技能表*/
+DROP TABLE IF EXISTS skill_table;
+CREATE TABLE skill_table (
+  skill_table_seq_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  skill_table_id 		INT(10) UNSIGNED NOT NULL,
+
+  skill_id 			INT(10) UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (skill_table_seq_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*技能*/
+DROP TABLE IF EXISTS skill;
+CREATE TABLE skill (
+  skill_id 			INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) DEFAULT '技能名字',
+
+  current_self_effect_id 	INT(10) UNSIGNED NOT NULL COMMENT '对己效果id',
+  enemy_effect_id 		INT(10) UNSIGNED NOT NULL COMMENT '对敌效果id',
+
+  PRIMARY KEY (skill_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*当下玩家效果*/
+DROP TABLE IF EXISTS current_self_effect;
+CREATE TABLE current_self_effect (
+  current_self_effect_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point	 	INT(10) DEFAULT NULL COMMENT '当前血量效果',
+  magic_point 	INT(10) DEFAULT NULL COMMENT '当前蓝量效果',
+  attack 		INT(10) DEFAULT NULL COMMENT '当前攻击效果',
+  defence 		INT(10) DEFAULT NULL COMMENT '当前防御效果',
+  speed 		INT(10) DEFAULT NULL COMMENT '当前速度效果',
+
+  PRIMARY KEY (current_self_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*对敌效果*/
+DROP TABLE IF EXISTS enemy_effect;
+CREATE TABLE enemy_effect (
+  enemy_effect_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  power 			int(10) DEFAULT NULL COMMENT '技能威力',
+  attack 			int(10) DEFAULT NULL COMMENT '对敌攻击属性',
+  defence 			int(10) DEFAULT NULL COMMENT '对敌防御属性',
+  speed 			int(10) DEFAULT NULL COMMENT '对敌速度属性',
+
+  PRIMARY KEY (enemy_effect_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*玩家存档*/
+DROP TABLE IF EXISTS role_saved;
+CREATE TABLE role_saved (
+  role_saved_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  role_status_id 		INT(10) UNSIGNED NOT NULL,
+  graph_id 		INT(10) UNSIGNED NOT NULL,
+
+  PRIMARY KEY (role_saved_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+/*玩家状态 */
+DROP TABLE IF EXISTS role_status;
+CREATE TABLE role_status (
+  role_status_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  hit_point 		INT(10) UNSIGNED DEFAULT NULL,
+  magic_point 		INT(10) UNSIGNED DEFAULT NULL,
+  attack 			INT(10) UNSIGNED DEFAULT NULL,
+  defence 			INT(10) UNSIGNED DEFAULT NULL,
+  speed 			INT(10) UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (role_status_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*存档地图*/
+DROP TABLE IF EXISTS graph;
+CREATE TABLE graph (
+  graph_seq_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  graph_id 		INT(10) UNSIGNED NOT NULL,
+
+  room_status 		TINYINT(1) UNSIGNED DEFAULT 1 COMMENT '房间状态。未探索为1，探索了为0',
+
+  room_id 		INT(10) UNSIGNED NOT NULL,
+  east_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  west_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  south_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+  north_room_id 		INT(10) UNSIGNED DEFAULT NULL,
+
+  PRIMARY KEY (graph_seq_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+/*房间*/
+DROP TABLE IF EXISTS room;
+CREATE TABLE room (
+  room_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  name 			VARCHAR(15) DEFAULT '房间名字',
+
+  room_event_id 		INT(10) UNSIGNED NOT NULL,
+
+  PRIMARY KEY (room_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*房间事件 */
+DROP TABLE IF EXISTS room_event;
+CREATE TABLE room_event (
+  room_event_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  type 			VARCHAR(15) DEFAULT '野怪出没',
+  description 		VARCHAR(100) DEFAULT NULL,
+  probability 		FLOAT DEFAULT NULL,
+
+  enemy_id 		INT(10) UNSIGNED DEFAULT NULL COMMENT '怪物id',
+  teleportation_room_id 	INT(10) UNSIGNED DEFAULT NULL COMMENT '传送房间id',
+  gotted_item_id 		INT(10) UNSIGNED DEFAULT NULL COMMENT '拾取物件id',
+
+  PRIMARY KEY (room_event_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*触发器*/
+/*
+删除user(role_id)，			相同role(role_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_user_delete  
+AFTER DELETE ON user  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role WHERE role_id = OLD.role_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+删除role(role_attribute_id)，		相同role_attribute(role_attribute_id)同步
+删除role(inventory_id)，		相同inventory(inventory_id)同步
+删除role(skill_table_id)，		相同skill_table(skill_table_id)同步
+删除role(role_saved_id)，		相同role_saved(role_saved_id)同步
+*/
+
+DELIMITER //  
+CREATE TRIGGER after_role_delete  
+AFTER DELETE ON role  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_attribute WHERE role_attribute_id = OLD.role_attribute_id;  
+    DELETE FROM inventory WHERE inventory_id = OLD.inventory_id;    
+    DELETE FROM skill_table WHERE skill_table_id = OLD.skill_table_id;  
+    DELETE FROM role_saved WHERE role_saved_id = OLD.role_saved_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+删除skill(current_self_effect_id)，		相同current_self_effect(current_self_effect_id)同步
+删除skill(enemy_effect_id)，			相同enemy_effect(enemy_effect_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_skill_delete  
+AFTER DELETE ON skill  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM current_self_effect WHERE current_self_effect_id = OLD.current_self_effect_id; 
+    DELETE FROM enemy_effect WHERE enemy_effect_id = OLD.enemy_effect_id; 
+END;  
+//  
+DELIMITER ;
+
+
+/*
+删除item(global_self_effect_id)，		相同global_self_effect(global_self_effect_id)同步
+删除item(item_attribute_id)，			相同item_attribute(item_attribute_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_item_delete  
+AFTER DELETE ON item  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM global_self_effect WHERE global_self_effect_id = OLD.global_self_effect_id;  
+    DELETE FROM item_attribute WHERE item_attribute_id = OLD.item_attribute_id;  
+END;  
+//  
+DELIMITER ;
+
+/*
+删除role_saved(role_status_id)，	相同role_status(role_status_id)同步
+删除role_saved(graph_id)，		相同graph(graph_id)同步
+*/
+DELIMITER //  
+CREATE TRIGGER after_role_saved_delete  
+AFTER DELETE ON role_saved  
+FOR EACH ROW  
+BEGIN  
+    DELETE FROM role_status WHERE role_status_id = OLD.role_status_id;  
+    DELETE FROM graph WHERE graph_id = OLD.graph_id;  
+END;  
+//  
+DELIMITER ;

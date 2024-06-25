@@ -1,0 +1,45 @@
+/*新的存档*/
+DROP TABLE IF EXISTS game_saved;
+CREATE TABLE game_saved (
+  game_saved_id 		INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  player_attribute_id 	INT(10) NOT NULL DEFAULT -1,
+  player_status_id 		INT(10) NOT NULL DEFAULT -1,
+  inventory_id 		INT(10) NOT NULL DEFAULT -1,
+  player_skill_table_id 	INT(10) NOT NULL DEFAULT 1,
+  saved_graph_id 		INT(10) NOT NULL DEFAULT -1,
+  in_room_id 		INT(10) NOT NULL DEFAULT 1,
+
+  PRIMARY KEY (game_saved_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS player_attribute;
+CREATE TABLE player_attribute (
+  player_attribute_id 	INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  description VARCHAR(100) NOT NULL DEFAULT '自诩是罗林的后世弟子，但是拙劣的剑术总是告诉了一切',
+
+  type VARCHAR(15) NOT NULL DEFAULT '见习剑客',
+  hit_point 		INT(10) NOT NULL DEFAULT 100,
+  magic_point 		INT(10) NOT NULL DEFAULT 100,
+  attack 			INT(10) NOT NULL DEFAULT 10,
+  defence 			INT(10) NOT NULL DEFAULT 10,
+  speed 			INT(10) NOT NULL DEFAULT 10,
+  max_weight 		INT(10) NOT NULL DEFAULT 100 COMMENT '最大承重',
+
+  PRIMARY KEY (player_attribute_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/*游戏缓存*/
+新增了temp_player__saved、temp_enemy表，可以把玩家存档信息和当前敌人缓存
+
+CREATE TABLE temp_player__saved (
+  player_id int(10) DEFAULT -1,
+  selection int(10) DEFAULT -1,
+  game_saved_id int(10) DEFAULT -1
+) ENGINE=InnoDB DEFAULT CHARSET=gbk
+
+CREATE TABLE temp_enemy (
+  enemy_id int(10) DEFAULT -1,
+  hit_point int(10) DEFAULT -1
+) ENGINE=InnoDB DEFAULT CHARSET=gbk

@@ -1,0 +1,29 @@
+// 请勿修改所有与存档相关表的默认数据！
+// 请勿修改表player_skill_table/saved_graph的模拟数据，他们将作为saved_game_id的默认数据！！！
+// 一定要看完
+// 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊（视觉噪声攻击）
+
+/*新的存档*/
+* game_saved的player_skill_table_id设置为静态，1（暂时不支持自定义技能表）
+每次建立新的存档时：
+* 生成6位game_saved_id/player_attribute_id/player_status_id/inventory_id/saved_graph_id结合成为
+(game_saved_id, player_attribute_id, player_status_id, inventory_id, 1 , saved_graph_id, -1)插入game_saved表中
+
+* 完成player_attribute_id/player_status_id/inventory_id/saved_graph_id的初始化
+// 市场大多数游戏选择的是新的存档-角色选择-地图选择，但是为了简化，去除角色选择、地图选择采取静态角色与地图
+即：
+* 直接将player_attribute_id插入player_attribute，采取默认值
+* 直接将player_status_id插入player_attribute，采取默认值
+* 直接将inventory_id插入inventory，采取默认值
+***********************saved_graph的区别！！！****************
+// saved_graph	因为(saved_graph)1..n(room)的一对多情况，故无法像player_attribute，直接将player_attribute_id插入player_attribute，采取默认值
+		又因为刚开始无法为空，不能像inventory一样直接将inventory_id插入inventory
+		又因为我们不支持选择地图，只能使用一个地图
+故此情况就类似于默认选择了静态资源initial_graph(initial_graph_id = 1)
+所以应该将initial_graph(initial_graph_id = 1)信息赋值给saved_graph(saved_graph_id)
+// 其实这就是我设想的游戏玩法--，初始化的时候应当根据选择在静态资源里初始化该玩家的存档资源，但是时间关系这些东西都不得不放弃了（唉
+
+/*游戏缓存*/
+新增了temp_player__saved、temp_enemy表，可以把玩家存档信息和当前敌人缓存
+
+// 啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊

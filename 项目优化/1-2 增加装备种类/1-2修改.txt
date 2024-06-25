@@ -1,0 +1,17 @@
+数据库3.3
+新增表player_equipment(li_id, player_equipment_id, item_id, type)
+在game_saved中增加player_equipment_id
+修改装备类型（武器，防具，配件，靴子）
+修改装备属性使得更加合理
+
+后端
+pojo新增player_equipment(li_id, player_equipment_id, item_id, type)
+saved_graph中增加player_equipment_id
+使用物品信息时对于装备类（武器，防具，配件，靴子）额外判断。
+对于装备A（类型X）：
+* 若已穿装备中有装备B（类型X），则替代装备B。玩家：i.脱下装备B	ii.穿上装备A
+=>inventory(A.NUM- -, B.NUM++)。角色的总属性与状态发生相应的改变，即：装备B效果被移除，装备A效果生效
+* 若已穿装备中无类型X，则插入player_equipment表中。玩家inventory(A.NUM- -)，player_equipment(A.NUM++)。角色的总属性与状态发生相应的改变。
+2. 脱下装备A时从player_equipment中删除装备A
+
+前端：装备显示（武器，防具，配件，靴子）

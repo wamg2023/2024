@@ -1,0 +1,27 @@
+人物等级成长描述
+HP:  100 -> 100(+20*LV)
+MP: 100 -> 100(+20*LV)
+ATK:15 -> 15(+3*LV)
+DEF:15 -> 15(+3*LV)
+SPD:10 -> 10(+2*LV)
+每集升级所需EXP: 10*LV
+击败野怪获得EXP:  0.1*enemy.HP+0.5*enemy.ATK+0.5*enemy.DEF+0.1*enemy.SPD
+
+数据库修改
+player_attribute新增LV和EXP
+item_effect新增EXP
+
+后端修改
+pojo类：player_attribute新增LV和EXP、item_effect新增EXP
+每次击杀怪物获取经验或者使用增加经验的物品（食物）时，增加经验add_EXP
+loop{
+if (player_attributre.EXP + add_EXP) < 10*LV:
+	player_attribute.EXP = Old.player_attributre.EXP + add_EXP
+else:
+	add_EXP = Old.player_attributre.EXP - 10*LV
+	player_attributre.EXP = 0
+	LV++
+}
+返回玩家信息新增LV和EXP，使用物品新增EXP效果
+
+前端：经验条的设计
