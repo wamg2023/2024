@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "qianduan": "npm run serve"
+    "qianduan": "npm run build"
   },
   "dependencies": {
     "axios": "^1.7.2",
