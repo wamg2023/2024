@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
-          path: dist  # 构建生成的静态文件目录，根据项目配置修改
+          path: /home/runner/work/2024/2024/qianduan  # 构建生成的静态文件目录，根据项目配置修改
