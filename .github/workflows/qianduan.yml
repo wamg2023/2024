@@ -24,6 +24,12 @@ jobs:
       - name: 安装项目依赖包
         run: npm install  # 如果是使用yarn，改为yarn install
 
+      - name: yunxinghuanjing
+          run: npm run serve
+
+      - name: 配置环境
+          run:  npm run build
+
       - name: 执行前端项目
         run: npm run qianduan  # 根据项目配置的命令进行构建，比如npm run build
 
