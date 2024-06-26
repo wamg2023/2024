@@ -13,15 +13,15 @@ jobs:
       - name: 提取仓库代码
         uses: actions/checkout@v4
 
-      - name: 安装node.js文件并运行npm命令
+      - name: 设置Node.js环境并安装依赖
         uses: actions/setup-node@v4
         with:
-          node-version: '14'  # 可根据项目需要选择Node.js版本
+          node-version: '14'  # 根据项目需要选择Node.js版本
 
       - name: 切换到项目目录并安装依赖
         run: |
           cd /home/runner/work/2024/2024/qianduan
-          npm install  # 如果是使用yarn，改为yarn install
+          npm install
 
       - name: 运行前端构建命令
         run: npm run qianduan
