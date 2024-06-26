@@ -20,13 +20,10 @@ jobs:
 
       - name: 切换到项目目录
         run: cd /home/runner/work/2024/2024/qianduan
+        with:
+          run: npm install  # 如果是使用yarn，改为yarn install
+          run: npm run qianduan
 
-      - name: 安装项目依赖包
-        run: npm install  # 如果是使用yarn，改为yarn install
-
-
-      - name: 执行前端项目
-        run: npm run qianduan  # 根据项目配置的命令进行构建，比如npm run build
 
       - name: 打包存档文件
         uses: actions/upload-artifact@v4
