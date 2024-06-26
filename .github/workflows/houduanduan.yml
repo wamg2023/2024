@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: '/home/runner/work/2024/2024/qianduan/target/*.jar'  # 根据实际的JAR文件路径进行修改
+          path: '/home/runner/work/2024/2024/qianduan/*.jar'  # 根据实际的JAR文件路径进行修改
