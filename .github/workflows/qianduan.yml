@@ -45,7 +45,7 @@ jobs:
         id: deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          BRANCH: gh-pages
+          BRANCH: fabu
           FOLDER: /home/runner/work/2024/2024/qianduan
 
       - name: Set Deployment URL
