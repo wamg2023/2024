@@ -11,22 +11,23 @@ jobs:
 
     steps:
       - name: 提取后端仓库代码
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: 切换到项目目录
         run: |
           cd /home/runner/work/2024/2024/qianduan
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11.0.1'  # 可根据项目需要选择Java版本
+      - name: 创建jdk
+          uses: actions/setup-java@v4
+          with:
+            java-version: '11'  # 设置所需的Java版本
+            distribution: 'adopt'  # 使用adoptopenjdk作为Java发行版本
 
       - name: 基于maven构建项目
         run: mvn clean package  # 构建项目，生成可执行的JAR文件
 
       - name: 打包后端存档文件
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: backend-jar
           path:  /home/runner/work/2024/2024/qianduan/*.jar  # 根据实际的JAR文件路径进行修改
