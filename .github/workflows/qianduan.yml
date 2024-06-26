@@ -41,16 +41,4 @@ jobs:
           name: frontend-dist
           path: /home/runner/work/2024/2024/qianduan
 
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          BRANCH: fabu
-          FOLDER: /home/runner/work/2024/2024/qianduan
-
-      - name: Set Deployment URL
-        run: echo "DEPLOYMENT_URL=https://your-github-pages-url" >> $GITHUB_ENV
-
-      - name: Finalize Deployment
-        run: |
-          echo "The deployment URL is $DEPLOYMENT_URL"
+     
