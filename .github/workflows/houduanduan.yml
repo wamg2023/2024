@@ -10,23 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: 提取后端仓库代码
         uses: actions/checkout@v2
 
       - name: 切换到项目目录
-          run: cd houduan
+        run: |
+          cd /home/runner/work/2024/2024/qianduan
 
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: ' 11.0.1'  # 可根据项目需要选择Java版本
+          java-version: '11.0.1'  # 可根据项目需要选择Java版本
 
-      - name: Build with Maven
+      - name: 基于maven构建项目
         run: mvn clean package  # 构建项目，生成可执行的JAR文件
 
-      - name: Upload Artifact
+      - name: 打包后端存档文件
         uses: actions/upload-artifact@v2
         with:
           name: backend-jar
-          path: target/*.jar  # 根据实际的JAR文件路径进行修改
-
+          path:  /home/runner/work/2024/2024/qianduan/*.jar  # 根据实际的JAR文件路径进行修改
