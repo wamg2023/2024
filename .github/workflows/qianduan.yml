@@ -33,9 +33,3 @@ jobs:
         with:
           name: frontend-dist
           path: dist  # 构建生成的静态文件目录，根据项目配置修改
-
-      - name: 部署前端应用到GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          BRANCH: gh-pages  # 发布到的分支，通常是gh-pages
-          FOLDER: dist  # 构建生成的静态文件目录
