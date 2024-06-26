@@ -33,7 +33,6 @@ jobs:
       - name: 部署前端应用到GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # GitHub Token，需要在仓库设置中添加
           BRANCH: gh-pages  # 发布到的分支，通常是gh-pages
           FOLDER: dist  # 构建生成的静态文件目录
 
