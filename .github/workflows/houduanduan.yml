@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 切换到项目目录
-          run: cd 后端
+          run: cd houduan
 
       - name: Set up JDK
         uses: actions/setup-java@v2
