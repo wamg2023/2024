@@ -26,7 +26,7 @@ jobs:
       - name: 运行前端构建命令
         run: |
           cd /home/runner/work/2024/2024/qianduan
-          npm run bulid2
+          npm run qianduan
 
       - name: 打包存档文件
         uses: actions/upload-artifact@v4
