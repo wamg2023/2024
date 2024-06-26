@@ -23,6 +23,16 @@ jobs:
           cd /home/runner/work/2024/2024/qianduan
           npm install
 
+      - name: 跳转到指定位置并并运行前端项目
+          run: |
+            cd /home/runner/work/2024/2024/qianduan
+            npm run qianduan
+
+      - name: 跳转到指定位置并并运行前端项目
+          run: |
+            cd /home/runner/work/2024/2024/qianduan
+            npm run bulid
+
 
       - name: 打包存档文件
         uses: actions/upload-artifact@v4
@@ -36,7 +46,4 @@ jobs:
           BRANCH: gh-pages  # 发布到的分支，通常是gh-pages
           FOLDER: dist  # 构建生成的静态文件目录
 
-      - name: 跳转到指定位置并并运行前端项目
-          run: |
-            cd /home/runner/work/2024/2024/qianduan
-            npm run qianduan
+
