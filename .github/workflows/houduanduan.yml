@@ -18,10 +18,10 @@ jobs:
           cd /home/runner/work/2024/2024/qianduan
 
       - name: 创建jdk
-          uses: actions/setup-java@v4
-          with:
-            java-version: '11'  # 设置所需的Java版本
-            distribution: 'adopt'  # 使用adoptopenjdk作为Java发行版本
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'  # 设置所需的Java版本
+          distribution: 'adopt'  # 使用adoptopenjdk作为Java发行版本
 
       - name: 基于maven构建项目
         run: mvn clean package  # 构建项目，生成可执行的JAR文件
@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path:  /home/runner/work/2024/2024/qianduan/*.jar  # 根据实际的JAR文件路径进行修改
+          path: '/home/runner/work/2024/2024/qianduan/target/*.jar'  # 根据实际的JAR文件路径进行修改
