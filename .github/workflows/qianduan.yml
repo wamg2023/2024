@@ -34,4 +34,11 @@ jobs:
           name: frontend-dist
           path: /home/runner/work/2024/2024/qianduan  # 构建生成的静态文件目录，根据项目配置修改
 
+      - name: Deploy to GitHub Pages
+          uses: JamesIves/github-pages-deploy-action@4.1.4
+          with:
+            ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN_OK1 }}  # 使用之前配置的Secrets中的Token
+            BRANCH: gh-pages  # 发布到的分支，通常是 gh-pages
+            FOLDER: dist  # 构建生成的静态文件目录，与上面保持一致
+
       
