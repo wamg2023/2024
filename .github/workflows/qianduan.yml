@@ -37,6 +37,5 @@ jobs:
       - name: 将项目发布到gh-page上
           uses: JamesIves/github-pages-deploy-action@4.1.4
           with:
-            ACCESS_TOKEN: ${{ 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 }}  # 使用之前配置的Secrets中的Token
             BRANCH: gh-pages  # 发布到的分支，通常是 gh-pages
             FOLDER: /home/runner/work/2024/2024/qianduan  # 构建生成的静态文件目录，与上面保持一致
