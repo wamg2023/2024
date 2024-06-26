@@ -13,6 +13,11 @@ jobs:
       - name: 提取仓库代码
         uses: actions/checkout@v4
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "wamg2023"
+          git config --global user.email "2366835906@qq.com"
+
       - name: 设置Node.js环境并安装依赖
         uses: actions/setup-node@v4
         with:
