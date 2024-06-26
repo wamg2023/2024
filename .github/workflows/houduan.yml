@@ -20,7 +20,6 @@ jobs:
       - name: 创建jdk
         uses: actions/setup-java@v4
         with:
-          path: '/home/runner/work/2024/2024/houduan'
           java-version: '11'  # 设置所需的Java版本
           distribution: 'adopt'  # 使用adoptopenjdk作为Java发行版本
 
@@ -34,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: '/home/runner/work/2024/2024/houduan/*.jar'  # 确认实际的JAR文件路径是否正确
+          path: '/home/runner/work/2024/2024/houduan'  # 确认实际的JAR文件路径是否正确
