@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: '14'  # 可根据项目需要选择Node.js版本
 
+      - name: 切换到项目目录
+        run: cd 前端
+
       - name: 安装项目依赖包
         run: npm install  # 如果是使用yarn，改为yarn install
 
