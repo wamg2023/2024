@@ -15,7 +15,7 @@ jobs:
 
       - name: 切换到项目目录
         run: |
-          cd /home/runner/work/2024/2024/qianduan
+          cd /home/runner/work/2024/2024/houduan
 
       - name: 创建jdk
         uses: actions/setup-java@v4
@@ -27,10 +27,10 @@ jobs:
         run: mvn clean package  # 构建项目，生成可执行的JAR文件
 
       - name: 列出生成的JAR文件
-        run: ls /home/runner/work/2024/2024/qianduan/target/*.jar  # 确认生成的JAR文件路径是否正确
+        run: ls /home/runner/work/2024/2024/houduan/target/*.jar  # 确认生成的JAR文件路径是否正确
 
       - name: 打包后端存档文件
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: '/home/runner/work/2024/2024/qianduan/target/*.jar'  # 确认实际的JAR文件路径是否正确
+          path: '/home/runner/work/2024/2024/houduan/target/*.jar'  # 确认实际的JAR文件路径是否正确
