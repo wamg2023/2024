@@ -13,8 +13,10 @@ jobs:
       - name: 提取仓库代码
         uses: actions/checkout@v4
 
-      - name: Configure Git
+      - name: Clean up and configure Git
         run: |
+          git remote rm origin
+          git remote add origin https://github.com/wamg2023/2024.git
           git config --global user.name "wamg2023"
           git config --global user.email "2366835906@qq.com"
 
@@ -43,4 +45,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           BRANCH: gh-pages  # 发布到的分支，通常是 gh-pages
-          FOLDER: dist  # 构建生成的静态文件目录，与上面保持一致
+          FOLDER: /home/runner/work/2024/2024/qianduan  # 构建生成的静态文件目录，与上面保持一致
