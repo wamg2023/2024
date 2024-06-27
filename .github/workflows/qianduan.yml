@@ -31,7 +31,7 @@ jobs:
       - name: 打包存档文件
         uses: actions/upload-artifact@v4
         with:
-          name: 前端代码
+          name: frontend-dist
           path: /home/runner/work/2024/2024/qianduan
 
      
